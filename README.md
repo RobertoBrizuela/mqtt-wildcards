@@ -89,7 +89,7 @@ Con la implementación de wildcards (`+` y `#`) en los tópicos MQTT, la interfa
   * Utiliza **mqtt.js** para conectar vía WebSockets.
   * Renderiza datos en **Chart.js** y crea tarjetas dinámicas por `deviceId`.
 
-## Diagrama Comparativo
+## Ventajas de los wildcards
 
 1. **Sin wildcards**: Se requería una suscripción por cada ESP32:
 
@@ -105,4 +105,9 @@ Con la implementación de wildcards (`+` y `#`) en los tópicos MQTT, la interfa
    client.subscribe('sensores/+/temperatura');
    client.subscribe('sensores/#');
    ```
+
+## Diagrama del funcionamiento:
+
+   ![image](https://github.com/user-attachments/assets/991cb88b-4b39-4e37-ad01-12b9eb87fdb8)
+
 
