@@ -1,3 +1,9 @@
+// --- Supabase setup ---
+const SUPABASE_URL    = 'https://jewkdyheholhvafarbhl.supabase.co';
+const SUPABASE_ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impld2tkeWhlaG9saHZhZmFyYmhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0MjM5MjQsImV4cCI6MjA2Mjk5OTkyNH0.jVSQiC3yZ8xHqb4jaeiSlIEDG3TUwiR1MF9dJLWErvc';
+const supabase        = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+
 // -------------------------------
 // Configuración de conexión
 // -------------------------------
@@ -97,22 +103,40 @@ function getDeviceContainer(deviceId) {
 // -------------------------------
 // Recibir datos MQTT
 // -------------------------------
-client.on("message", (topic, message) => {
-    const parts    = topic.split("/");
-    const deviceId = parts[1];
-    const dataType = parts[2];
-    const payload  = message.toString();
+client.on("message", async (topic, message) => {
+  const parts    = topic.split("/");
+  const deviceId = parts[1];
+  const dataType = parts[2];
+  const payload  = message.toString();
 
-    const container = getDeviceContainer(deviceId);
+  const container = getDeviceContainer(deviceId);
 
-    if (dataType === "temperatura" || dataType === "humedad") {
-        const obj   = JSON.parse(payload);
-        const value = obj[dataType];
-        container.querySelector(`.${dataType}`).innerText = value.toFixed(1);
-        updateChart(obj.temperatura, obj.humedad);
-    } else if (dataType === "led") {
-        console.log(`Estado LED de ${deviceId}: ${payload}`);
+  if (dataType === "temperatura" || dataType === "humedad") {
+    const obj   = JSON.parse(payload);
+    const value = obj[dataType];
+
+    // 1) Actualiza la User Interface
+    container.querySelector(`.${dataType}`).innerText = value.toFixed(1);
+    updateChart(obj.temperatura, obj.humedad);
+
+    // 2) Inserta en Supabase
+    const { data, error } = await supabase
+      .from('DataTempTE')       // Nombre de nuestra tabla en Supabase
+      .insert([{
+        temperature: obj.temperatura,
+        humidity:    obj.humedad,
+        device_id:   deviceId
+      }]);
+
+    if (error) {
+      console.error('Error al insertar en Supabase:', error);
+    } else {
+      console.log('Guardado en Supabase:', data);
     }
+  }
+  else if (dataType === "led") {
+    console.log(`Estado LED de ${deviceId}: ${payload}`);
+  }
 });
 
 // -------------------------------
