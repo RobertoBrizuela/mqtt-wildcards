@@ -1,7 +1,7 @@
 // --- Supabase setup ---
 const SUPABASE_URL    = 'https://jewkdyheholhvafarbhl.supabase.co';
 const SUPABASE_ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impld2tkeWhlaG9saHZhZmFyYmhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0MjM5MjQsImV4cCI6MjA2Mjk5OTkyNH0.jVSQiC3yZ8xHqb4jaeiSlIEDG3TUwiR1MF9dJLWErvc';
-const supabase        = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const clientSupabase      = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 
 // -------------------------------
@@ -120,8 +120,8 @@ client.on("message", async (topic, message) => {
     updateChart(obj.temperatura, obj.humedad);
 
     // 2) Inserta en Supabase
-    const { data, error } = await supabase
-      .from('DataTempTE')       // Nombre de nuestra tabla en Supabase
+    const { data, error } = await clientSupabase
+      .from('measurements')       // Nombre de nuestra tabla en Supabase
       .insert([{
         temperature: obj.temperatura,
         humidity:    obj.humedad,
